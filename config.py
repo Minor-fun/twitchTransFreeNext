@@ -35,8 +35,16 @@ TTS_MessageForOmitting  = ""
 # for example, ['ja'] means Japanese only, ['ko','en'] means Korean and English are TTS!
 ReadOnlyTheseLang       = []
 
-# Select the translate engine ('deepl' or 'google')
+# Select the translate engine ('deepl' or 'google' or 'ai')
 Translator              = 'google'
+
+# AI Translator Settings (OpenAI Compatible API)
+# Supports: OpenAI, OpenRouter, Cloudflare AI Gateway, local LLM, etc.
+AI_API_URL              = ''  # e.g. 'https://api.openai.com/v1' or 'https://openrouter.ai/api/v1'
+AI_API_Key              = ''  # Your API key
+AI_Model                = ''  # e.g. 'gpt-4o-mini', 'claude-3-haiku', etc.
+AI_System_Prompt        = ''  # Custom system prompt (optional, leave empty for default)
+AI_Temperature          = 0.3  # Temperature for AI responses (0.0-2.0, lower = more deterministic)
 
 # Use Google Apps Script for tlanslating
 # e.g.) GAS_URL         = 'https://script.google.com/macros/s/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/exec'

@@ -7,6 +7,7 @@ from twitchio.ext import commands
 from emoji import distinct_emoji_list
 import json, os, shutil, re, asyncio, deepl, sys, signal, tts, sound
 import database_controller as db # ja:既訳語データベース   en:Translation Database
+import ai_translator  # AI翻訳エンジン（OpenAI互換API）
 
 version = '2.7.16'
 '''
@@ -164,6 +165,21 @@ else:
 translator = AsyncTranslator(url_suffix=url_suffix)
 tts = tts.TTS(config, TMP_DIR)
 sound = sound.Sound(config, SOUND_DIR)
+
+# AI翻訳器の初期化（AIを使用する設定の場合）
+if hasattr(config, 'Translator') and config.Translator == 'ai':
+    ai_api_url = getattr(config, 'AI_API_URL', '')
+    ai_api_key = getattr(config, 'AI_API_Key', '')
+    ai_model = getattr(config, 'AI_Model', '')
+    ai_system_prompt = getattr(config, 'AI_System_Prompt', None)
+    ai_temperature = getattr(config, 'AI_Temperature', 0.3)
+    ai_debug = getattr(config, 'Debug', False)
+    
+    if ai_api_url and ai_api_key and ai_model:
+        ai_translator.init_translator(ai_api_url, ai_api_key, ai_model, ai_system_prompt, ai_temperature, ai_debug)
+        if ai_debug: print(f'[AI Translator] Initialized with model: {ai_model}')
+    else:
+        print('[AI Translator] ERROR: AI_API_URL, AI_API_Key, and AI_Model must be set in config.py')
 
 ##########################################
 # cacert.pem の場所を特定
@@ -514,6 +530,14 @@ class Bot(commands.Bot):
                         if config.Debug: print('[Google Tlanslate (Google Apps Script)]')
                     except Exception as e:
                         if config.Debug: print(e)
+
+            # use AI (OpenAI Compatible API) ----------
+            elif config.Translator == 'ai':
+                try:
+                    translatedText = await ai_translator.translate(in_text, lang_detect, lang_dest)
+                    if config.Debug: print('[AI Translate (OpenAI Compatible API)]')
+                except Exception as e:
+                    if config.Debug: print(e)
 
             else:
                 print(f'ERROR: config TRANSLATOR is set the wrong value with [{config.Translator}]')
